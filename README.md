@@ -1,4 +1,4 @@
-# New Project
+# New Project - Chess using React & TypeScript
 
 > ✨ Bootstrapped with Create Snowpack App (CSA).
 
