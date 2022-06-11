@@ -1,9 +1,10 @@
 import React from 'react';
+import "./App.css"
 
 const App = () => {
   return (
-    <div>
-      check
+    <div className='app'>
+      Test
     </div>
   );
 };
