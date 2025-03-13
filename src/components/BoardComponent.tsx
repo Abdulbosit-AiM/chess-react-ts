@@ -1,29 +1,67 @@
-import React  from "react";
+import React, { useEffect, useState } from "react";
 import { Board } from "../models/Board";
-import type { Cell } from "../models/Cell";
+import { Cell } from "../models/Cell";
+import { Player } from "../models/Player";
 import CellComponent from "./CellComponent";
 
 interface BoardProps {
-    board: Board
-    setBoard: (board: Board) => void
+  board: Board;
+  setBoard: (board: Board) => void;
+  currentPlayer: Player | null;
+  swapPlayer: () => void;
 }
 
-const BoardComponent = () => {
-    return (
-        <div className="board">
-            {Board.cells.map((row: Cell, index: number) => 
-                <React.Fragment key={index}>
+const BoardComponent: React.FC<BoardProps> = ({ 
+  board, 
+  setBoard, 
+  currentPlayer, 
+  swapPlayer 
+}) => {
+  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
 
-                    {row.map(cell => 
-                        <CellComponent 
+  function click(cell: Cell) {
+    if (selectedCell && selectedCell !== cell && selectedCell.figure?.canMove(cell)) {
+      selectedCell.moveFigure(cell);
+      swapPlayer();
+      setSelectedCell(null);
+      updateBoard();
+    } else {
+      if (cell.figure?.color === currentPlayer?.color) {
+        setSelectedCell(cell);
+      }
+    }
+  }
 
-                        />
-                    )}
-            
-                </React.Fragment>
-            )}
-        </div>
-    )
-}
+  useEffect(() => {
+    highlightCells();
+  }, [selectedCell]);
 
-export default BoardComponent
+  function highlightCells() {
+    board.highlightCells(selectedCell);
+    updateBoard();
+  }
+
+  function updateBoard() {
+    const newBoard = board.getCopyBoard();
+    setBoard(newBoard);
+  }
+
+  return (
+    <div className="board">
+      {board.cells.map((row, index) => (
+        <React.Fragment key={index}>
+          {row.map(cell => (
+            <CellComponent
+              click={click}
+              key={cell.id}
+              cell={cell}
+              selected={cell.x === selectedCell?.x && cell.y === selectedCell?.y}
+            />
+          ))}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+};
+
+export default BoardComponent;
